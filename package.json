@@ -1,0 +1,12 @@
+{
+  "name": "design-system-poc",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @design-system-poc/react-19 dev",
+    "build": "pnpm -r build",
+    "build:ui": "pnpm --filter @design-system-poc/ui build",
+    "preview": "pnpm --filter @design-system-poc/react-19 preview"
+  }
+}
