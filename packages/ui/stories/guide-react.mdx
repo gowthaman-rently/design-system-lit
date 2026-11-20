@@ -50,7 +50,7 @@ export function Signup() {
 - `ds-button` → `Button`
 - `ds-text-field` → `TextField`
 - `ds-dialog` → `Dialog`
-- `ds-tabs` and `ds-tab-panel` → `Tabs` and `TabPanel`
+- `ds-tabs`, `ds-tab` and `ds-tab-panel` → `Tabs`, `Tab` and `TabPanel`
 
 Props match the element properties listed on each component's Docs page. Boolean props
 work as usual: `<Button disabled>`.
@@ -77,10 +77,17 @@ const [email, setEmail] = useState('')
 
 const [tab, setTab] = useState('general')
 <Tabs label="Settings" value={tab} onChange={(e) => setTab(e.detail.value)}>
-  <TabPanel name="general" label="General">…</TabPanel>
-  <TabPanel name="billing" label="Billing">…</TabPanel>
+  <Tab panel="general">General</Tab>
+  <Tab panel="billing">Billing <span className="count">3</span></Tab>
+
+  <TabPanel name="general">…</TabPanel>
+  <TabPanel name="billing">…</TabPanel>
 </Tabs>
 ```
+
+A `Tab`'s content is its label, so it can hold icons or badges. Its `panel` names the
+`TabPanel` it shows. Put each `Tab` and `TabPanel` directly inside `Tabs`, not inside a
+fragment or another component: `Tabs` marks the selected ones, also on the server.
 
 A dialog closes itself on Escape, the close button or a backdrop click. Keep your state in
 sync with `onClose`, or it won't open again:

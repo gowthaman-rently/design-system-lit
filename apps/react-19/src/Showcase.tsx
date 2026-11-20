@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Button, Dialog, TabPanel, Tabs, TextField } from '@gowthaman-rently/design-system-lit/react'
+import { Button, Dialog, Tab, TabPanel, Tabs, TextField } from '@gowthaman-rently/design-system-lit/react'
 import './showcase.css'
 
 const themes = ['system', 'light', 'dark'] as const
@@ -140,13 +140,19 @@ export function Showcase() {
       <section aria-labelledby="tabs">
         <h2 id="tabs">Tabs</h2>
         <Tabs label="Project settings" value={tab} onChange={(e) => setTab(e.detail.value)}>
-          <TabPanel name="general" label="General">
+          <Tab panel="general">General</Tab>
+          <Tab panel="members">
+            Members <span className="count">3</span>
+          </Tab>
+          <Tab panel="billing">Billing</Tab>
+
+          <TabPanel name="general">
             <p>Project name, description and visibility.</p>
           </TabPanel>
-          <TabPanel name="members" label="Members">
+          <TabPanel name="members">
             <p>Invite people and manage their roles.</p>
           </TabPanel>
-          <TabPanel name="billing" label="Billing">
+          <TabPanel name="billing">
             <p>Plan, invoices and payment method.</p>
           </TabPanel>
         </Tabs>

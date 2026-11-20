@@ -102,14 +102,14 @@
 }
 
 /*
- * Before the components' JavaScript has loaded (server-rendered HTML):
- * keep closed dialogs hidden, show only the first tab panel, and reserve
- * space for controls to limit layout shift.
+ * Before the components' JavaScript has loaded: keep closed dialogs hidden,
+ * show one tab panel, and reserve space for controls to limit layout shift.
  */
 ds-dialog:not(:defined) {
   display: none;
 }
-ds-tabs:not(:defined) > ds-tab-panel:not(:first-of-type) {
+/* Tabs: show the first panel, unless server rendering already marked the selected one [active]. */
+ds-tabs:not(:defined):not(:has(> ds-tab-panel[active])) > ds-tab-panel:not(:first-of-type) {
   display: none;
 }
 ds-button:not(:defined) {

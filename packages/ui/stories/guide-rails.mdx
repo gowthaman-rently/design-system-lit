@@ -91,9 +91,12 @@ Components fire `ds-*` events. The value is in `event.detail.value`. Listen to t
 
 ```html
 <div data-controller="settings">
-  <ds-tabs label="Settings" data-action="ds-change->settings#tabChanged">
-    <ds-tab-panel name="general" label="General">…</ds-tab-panel>
-    <ds-tab-panel name="billing" label="Billing">…</ds-tab-panel>
+  <ds-tabs label="Settings" value="general" data-action="ds-change->settings#tabChanged">
+    <ds-tab slot="nav" panel="general">General</ds-tab>
+    <ds-tab slot="nav" panel="billing">Billing</ds-tab>
+
+    <ds-tab-panel name="general">…</ds-tab-panel>
+    <ds-tab-panel name="billing">…</ds-tab-panel>
   </ds-tabs>
 </div>
 ```
@@ -112,6 +115,9 @@ export default class extends Controller {
 - `ds-input`: `ds-text-field`, on every keystroke.
 - `ds-change`: `ds-text-field` (on blur or Enter) and `ds-tabs` (when a tab is selected).
 - `ds-close`: `ds-dialog`, after it closes.
+
+Each `ds-tab` needs `slot="nav"` to appear in the tab row. `value` on `ds-tabs` sets the
+selected tab; without it, the first tab is selected.
 
 ## A dialog with Stimulus
 

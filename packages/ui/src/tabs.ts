@@ -1,199 +1,61 @@
 import { LitElement, css, html, nothing, type PropertyValues } from 'lit'
-import { customElement, property, state } from 'lit/decorators.js'
+import { customElement, property, query } from 'lit/decorators.js'
 import { baseStyles } from './styles.js'
 
 /**
- * One panel of `<ds-tabs>`. Its `label` is the text of its tab.
+ * One tab of `<ds-tabs>`. Its content is the tab's label, so it can include
+ * icons or badges. Place it in the tab row with `slot="nav"` (the React `Tab`
+ * does this for you).
  *
- * @slot - Panel content.
- * @csspart base - The panel (`role="tabpanel"`).
+ * @slot - The tab's label.
+ * @csspart base - The tab (`role="tab"`).
  */
-@customElement('ds-tab-panel')
-export class DsTabPanel extends LitElement {
-  /** Identifies the panel; `<ds-tabs value>` selects a panel by this name. */
-  @property() name = ''
-  /** Text of the tab that shows this panel. */
-  @property() label = ''
-  /** Set by `<ds-tabs>`. Defaults to true so server-rendered HTML contains the content. */
-  @property({ type: Boolean }) active = true
+@customElement('ds-tab')
+export class DsTab extends LitElement {
+  /** Name of the `<ds-tab-panel>` this tab shows. */
+  @property() panel = ''
+  /**
+   * Whether the tab is selected. Set by `<ds-tabs>` from its `value` (and on the
+   * server by the React `Tabs`). Reflected, so CSS can style the selected tab.
+   */
+  @property({ type: Boolean, reflect: true }) selected = false
+
+  @query('button') private button?: HTMLButtonElement
+
+  /** Moves focus to the tab. */
+  override focus(options?: FocusOptions) {
+    this.button?.focus(options)
+  }
 
   protected updated(changed: PropertyValues<this>) {
-    // Let the parent <ds-tabs> re-render its tab list.
-    if (changed.has('name') || changed.has('label')) {
-      if (this.parentElement instanceof DsTabs) this.parentElement.requestUpdate()
-    }
+    // Let the parent <ds-tabs> sync its tabs and panels again.
+    if (changed.has('panel') && this.parentElement instanceof DsTabs) this.parentElement.requestUpdate()
   }
 
   render() {
-    return html`<div
+    return html`<button
       part="base"
-      class="panel"
-      role="tabpanel"
-      tabindex="0"
-      aria-label=${this.label}
-      ?hidden=${!this.active}
+      class="tab"
+      type="button"
+      role="tab"
+      aria-selected=${this.selected ? 'true' : 'false'}
+      tabindex=${this.selected ? 0 : -1}
     >
       <slot></slot>
-    </div>`
+    </button>`
   }
 
   static styles = [
     baseStyles,
     css`
       :host {
-        display: block;
+        display: inline-flex;
       }
-      .panel {
-        padding-block: var(--ds-space-4);
-        border-radius: var(--ds-radius-sm);
-      }
-      .panel[hidden] {
-        display: none;
-      }
-    `,
-  ]
-}
-
-/**
- * Tabs that each show one `<ds-tab-panel>` child.
- * Keyboard: Left/Right arrows move between tabs (mirrored in right-to-left
- * layouts), Home/End jump to the first/last tab.
- *
- * SSR: the server can't see child panels, so the tab list is rendered in the
- * browser after hydration; until then only the first panel is shown.
- *
- * @fires ds-change - When the user selects a tab. `event.detail.value` is the panel's name.
- * @csspart tablist - The row of tabs.
- * @csspart tab - Each tab.
- * @csspart tab-selected - The selected tab.
- */
-@customElement('ds-tabs')
-export class DsTabs extends LitElement {
-  /** Name of the selected panel. Defaults to the first panel. */
-  @property() value = ''
-  /** Accessible name of the tab list. */
-  @property() label = ''
-
-  /** Child panels. Read after the first render (also in the browser) so hydration matches the server. */
-  @state() private panels: DsTabPanel[] = []
-
-  private childObserver?: MutationObserver
-
-  connectedCallback() {
-    super.connectedCallback()
-    this.childObserver = new MutationObserver(() => this.readPanels())
-    this.childObserver.observe(this, { childList: true })
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback()
-    this.childObserver?.disconnect()
-  }
-
-  protected async firstUpdated() {
-    // Second render, after the first (hydrated) one has finished.
-    await this.updateComplete
-    this.readPanels()
-  }
-
-  protected updated() {
-    const selected = this.selectedPanel
-    for (const panel of this.panels) panel.active = panel === selected
-  }
-
-  private readPanels() {
-    this.panels = [...this.children].filter((child) => child instanceof DsTabPanel)
-  }
-
-  private get selectedPanel(): DsTabPanel | undefined {
-    return this.panels.find((panel) => panel.name === this.value) ?? this.panels[0]
-  }
-
-  private get tabs() {
-    return [...this.renderRoot.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
-  }
-
-  private select(panel: DsTabPanel) {
-    if (panel === this.selectedPanel) return
-    this.value = panel.name
-    this.dispatchEvent(
-      new CustomEvent('ds-change', { detail: { value: panel.name }, bubbles: true, composed: true }),
-    )
-  }
-
-  private handleKeydown(event: KeyboardEvent) {
-    const tabs = this.tabs
-    const current = tabs.indexOf(event.target as HTMLButtonElement)
-    if (current === -1) return
-    const step = getComputedStyle(this).direction === 'rtl' ? -1 : 1
-    const targets: Record<string, number> = {
-      ArrowRight: current + step,
-      ArrowLeft: current - step,
-      Home: 0,
-      End: tabs.length - 1,
-    }
-    if (!(event.key in targets)) return
-    event.preventDefault()
-    const next = (targets[event.key] + tabs.length) % tabs.length
-    tabs[next].focus()
-    this.select(this.panels[next])
-  }
-
-  render() {
-    const selected = this.selectedPanel
-    return html`
-      ${this.panels.length === 0
-        ? // Before the panels are known (server HTML, first render): show only the first one.
-          html`<style>
-            ::slotted(:not(:first-child)) {
-              display: none;
-            }
-          </style>`
-        : nothing}
-      <div
-        part="tablist"
-        class="tablist"
-        role="tablist"
-        aria-label=${this.label || nothing}
-        @keydown=${this.handleKeydown}
-      >
-        ${this.panels.map((panel) => {
-          const isSelected = panel === selected
-          return html`<button
-            part=${isSelected ? 'tab tab-selected' : 'tab'}
-            class="tab"
-            role="tab"
-            type="button"
-            aria-selected=${isSelected ? 'true' : 'false'}
-            tabindex=${isSelected ? 0 : -1}
-            @click=${() => this.select(panel)}
-          >
-            ${panel.label}
-          </button>`
-        })}
-      </div>
-      <slot></slot>
-    `
-  }
-
-  static styles = [
-    baseStyles,
-    css`
-      :host {
-        display: block;
-      }
-
-      .tablist {
-        display: flex;
-        gap: var(--ds-space-1);
-        /* Reserve the row's height before the tabs render (SSR) to avoid layout shift. */
-        min-height: calc(var(--ds-font-size-md) * 1.5 + 2 * var(--ds-space-2));
-        border-bottom: 1px solid var(--ds-color-border);
-        overflow-x: auto;
-      }
-
       .tab {
         position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--ds-space-2);
         padding: var(--ds-space-2) var(--ds-space-4);
         border: none;
         border-radius: var(--ds-radius-sm) var(--ds-radius-sm) 0 0;
@@ -233,9 +95,186 @@ export class DsTabs extends LitElement {
   ]
 }
 
+/**
+ * One panel of `<ds-tabs>`, shown by the `<ds-tab>` whose `panel` matches its `name`.
+ *
+ * @slot - Panel content.
+ * @csspart base - The panel (`role="tabpanel"`).
+ */
+@customElement('ds-tab-panel')
+export class DsTabPanel extends LitElement {
+  /** Identifies the panel; a `<ds-tab panel>` and `<ds-tabs value>` refer to it by this name. */
+  @property() name = ''
+  /**
+   * Whether the panel is shown. Set by `<ds-tabs>` from its `value` (and on the
+   * server by the React `Tabs`). Reflected, so CSS can show the selected panel
+   * before JavaScript loads.
+   */
+  @property({ type: Boolean, reflect: true }) active = true
+  /**
+   * The text of the panel's tab, used as its accessible name. Set by `<ds-tabs>`.
+   * @internal
+   */
+  @property({ attribute: false }) tabLabel = ''
+
+  protected updated(changed: PropertyValues<this>) {
+    // Let the parent <ds-tabs> sync its tabs and panels again.
+    if (changed.has('name') && this.parentElement instanceof DsTabs) this.parentElement.requestUpdate()
+  }
+
+  render() {
+    return html`<div
+      part="base"
+      class="panel"
+      role="tabpanel"
+      tabindex="0"
+      aria-label=${this.tabLabel || nothing}
+      ?hidden=${!this.active}
+    >
+      <slot></slot>
+    </div>`
+  }
+
+  static styles = [
+    baseStyles,
+    css`
+      :host {
+        display: block;
+      }
+      .panel {
+        padding-block: var(--ds-space-4);
+        border-radius: var(--ds-radius-sm);
+      }
+      .panel[hidden] {
+        display: none;
+      }
+    `,
+  ]
+}
+
+/**
+ * Tabs: a row of `<ds-tab slot="nav">` elements, each showing the
+ * `<ds-tab-panel>` with the matching name.
+ * Keyboard: Left/Right arrows move between tabs (mirrored in right-to-left
+ * layouts), Home/End jump to the first/last tab.
+ *
+ * @slot nav - The `<ds-tab>` elements.
+ * @slot - The `<ds-tab-panel>` elements.
+ * @fires ds-change - When the user selects a tab. `event.detail.value` is the panel's name.
+ * @csspart tablist - The row of tabs.
+ */
+@customElement('ds-tabs')
+export class DsTabs extends LitElement {
+  /** Name of the selected panel. Defaults to the tab marked `selected`, or the first tab. */
+  @property() value = ''
+  /** Accessible name of the tab list. */
+  @property() label = ''
+
+  private childObserver?: MutationObserver
+
+  connectedCallback() {
+    super.connectedCallback()
+    this.childObserver = new MutationObserver(() => this.requestUpdate())
+    this.childObserver.observe(this, { childList: true })
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    this.childObserver?.disconnect()
+  }
+
+  private get tabs() {
+    return [...this.children].filter((child) => child instanceof DsTab)
+  }
+
+  private get selectedName(): string | undefined {
+    const tabs = this.tabs
+    return (tabs.find((tab) => tab.panel === this.value) ?? tabs.find((tab) => tab.selected) ?? tabs[0])?.panel
+  }
+
+  /** Marks the selected tab and panel. Runs only in the browser (the server never calls `updated`). */
+  protected updated() {
+    const selected = this.selectedName
+    const tabs = this.tabs
+    for (const tab of tabs) tab.selected = tab.panel === selected
+    for (const panel of this.children) {
+      if (!(panel instanceof DsTabPanel)) continue
+      panel.active = panel.name === selected
+      panel.tabLabel = tabs.find((tab) => tab.panel === panel.name)?.textContent?.trim() ?? ''
+    }
+  }
+
+  private select(name: string) {
+    if (name === this.selectedName) return
+    this.value = name
+    this.dispatchEvent(new CustomEvent('ds-change', { detail: { value: name }, bubbles: true, composed: true }))
+  }
+
+  /** The `<ds-tab>` an event came from. */
+  private tabOf(event: Event) {
+    return event.composedPath().find((node) => node instanceof DsTab && node.parentElement === this) as DsTab | undefined
+  }
+
+  private handleClick(event: MouseEvent) {
+    const tab = this.tabOf(event)
+    if (tab) this.select(tab.panel)
+  }
+
+  private handleKeydown(event: KeyboardEvent) {
+    const tabs = this.tabs
+    const tab = this.tabOf(event)
+    if (!tab) return
+    const current = tabs.indexOf(tab)
+    const step = getComputedStyle(this).direction === 'rtl' ? -1 : 1
+    const targets: Record<string, number> = {
+      ArrowRight: current + step,
+      ArrowLeft: current - step,
+      Home: 0,
+      End: tabs.length - 1,
+    }
+    if (!(event.key in targets)) return
+    event.preventDefault()
+    const next = tabs[(targets[event.key] + tabs.length) % tabs.length]
+    next.focus()
+    this.select(next.panel)
+  }
+
+  render() {
+    return html`
+      <div
+        part="tablist"
+        class="tablist"
+        role="tablist"
+        aria-label=${this.label || nothing}
+        @click=${this.handleClick}
+        @keydown=${this.handleKeydown}
+      >
+        <slot name="nav"></slot>
+      </div>
+      <slot></slot>
+    `
+  }
+
+  static styles = [
+    baseStyles,
+    css`
+      :host {
+        display: block;
+      }
+      .tablist {
+        display: flex;
+        gap: var(--ds-space-1);
+        border-bottom: 1px solid var(--ds-color-border);
+        overflow-x: auto;
+      }
+    `,
+  ]
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'ds-tabs': DsTabs
+    'ds-tab': DsTab
     'ds-tab-panel': DsTabPanel
   }
 }

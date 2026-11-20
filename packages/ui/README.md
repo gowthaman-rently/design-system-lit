@@ -61,7 +61,7 @@ import '@gowthaman-rently/design-system-lit'
 | `<ds-button>`                  | `Button`            |
 | `<ds-text-field>`              | `TextField`         |
 | `<ds-dialog>`                  | `Dialog`            |
-| `<ds-tabs>` + `<ds-tab-panel>` | `Tabs` + `TabPanel` |
+| `<ds-tabs>` + `<ds-tab>` + `<ds-tab-panel>` | `Tabs` + `Tab` + `TabPanel` |
 
 Properties, events, slots and CSS parts are documented in Storybook, and in
 `custom-elements.json` in this package.

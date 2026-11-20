@@ -134,7 +134,7 @@ Any app with a bundler (Vite, webpack, …) can use the elements directly:
 | `<ds-button>`                   | `Button`             | 4 variants, 3 sizes, disabled and loading states, prefix/suffix slots, submits and resets forms |
 | `<ds-text-field>`               | `TextField`          | Label, hint and error text; works in native forms (`FormData`, reset, `required`/`email` validation) |
 | `<ds-dialog>`                   | `Dialog`             | Modal built on the native `<dialog>`: focus moves in and back out, Escape and backdrop click close it |
-| `<ds-tabs>` + `<ds-tab-panel>`  | `Tabs` + `TabPanel`  | Arrow keys, Home/End, mirrored in right-to-left layouts                       |
+| `<ds-tabs>` + `<ds-tab>` + `<ds-tab-panel>` | `Tabs` + `Tab` + `TabPanel` | Tab labels can hold icons or badges; arrow keys, Home/End, mirrored in right-to-left layouts |
 
 `<my-element>` is the example component from the original Vite template.
 
@@ -179,9 +179,11 @@ Rules for writing components that work with server rendering:
 
 1. **Don't touch the DOM in the constructor** (no `MutationObserver`, no reading
    children). On the server, only the constructor, `willUpdate` and `render` run.
-2. **Don't read child elements before the first render.** The server can't see them, and
-   the browser's first render must match the server's. Read them in `firstUpdated`, after
-   `await this.updateComplete`.
+2. **Render from properties, not from child elements.** The server can't see children, so
+   anything that must be in the server HTML has to come from the element's own properties.
+   For example, each `<ds-tab>` renders its own button from its `selected` property, which
+   the React `Tabs` sets from `value`. `<ds-tabs>` reads its children only in the browser,
+   after the first render, so that render matches the server's.
 3. **Don't use manual slot assignment.** Server-rendered shadow DOM can't express it.
 4. **Render `nothing`, not `''`,** for text that starts empty and fills in later.
    Otherwise, after hydration, Lit writes the text into a comment marker.
@@ -190,9 +192,7 @@ Rules for writing components that work with server rendering:
 6. **Don't rely on `slotchange` alone.** With server-rendered HTML the slot is already
    filled before the listener exists; check the slot again after the first render.
 
-Known limits: the Tabs tab row is rendered in the browser (the server can't see the
-panels); until then only the first panel is shown. `@lit-labs/ssr-react` is an
-experimental Lit Labs package.
+Known limit: `@lit-labs/ssr-react` is an experimental Lit Labs package.
 
 ## Storybook
 
@@ -268,4 +268,5 @@ local package through `workspace:*`, so nothing has to be published to work on t
   `rs-module-lexer` (`allowBuilds` in `pnpm-workspace.yaml`). Everything works without
   them. When pnpm stops on a new package with install scripts, decide there.
 - **Tabs and ARIA:** a tab can't point to its panel with `aria-controls`, because they
-  live in different shadow roots. Each panel gets its accessible name from its `label`.
+  live in different shadow roots. In the browser, each panel gets its accessible name from
+  the text of its tab.

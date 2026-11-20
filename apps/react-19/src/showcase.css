@@ -85,3 +85,11 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
+
+/* Rich tab label: a count badge inside a Tab. */
+.showcase .count {
+  padding: 0 0.5em;
+  border-radius: 999px;
+  background: var(--ds-color-primary-subtle);
+  font-size: var(--ds-font-size-sm);
+}
