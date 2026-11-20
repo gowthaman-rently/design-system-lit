@@ -1,0 +1,177 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Guides/Rails" />
+
+# Using the components in Rails
+
+The components are standard HTML elements, so you write them directly in ERB views. Form
+fields submit their values like native inputs, so `form_with`, strong parameters and Turbo
+work unchanged. Use Stimulus to react to their events.
+
+## 1. Install
+
+You need a JavaScript bundler: [jsbundling-rails](https://github.com/rails/jsbundling-rails)
+(esbuild, Bun or Rollup) or [Vite Ruby](https://vite-ruby.netlify.app).
+
+`importmap-rails` isn't supported yet: `bin/importmap pin` downloads packages from public
+CDNs, which can't access GitHub Packages.
+
+Add an `.npmrc` to the root of your Rails app. GitHub Packages needs a token with the
+`read:packages` scope, even for public packages.
+
+```ini
+@gowthaman-rently:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```bash
+yarn add @gowthaman-rently/design-system-lit
+```
+
+## 2. Load the components and tokens
+
+Register the elements once, in `app/javascript/application.js`:
+
+```js
+import "@gowthaman-rently/design-system-lit"
+```
+
+Load the design tokens once. With cssbundling-rails, in
+`app/assets/stylesheets/application.css` (or `.scss`):
+
+```css
+@import "@gowthaman-rently/design-system-lit/tokens.css";
+```
+
+Without a CSS bundler, copy `node_modules/@gowthaman-rently/design-system-lit/tokens.css`
+into `app/assets/stylesheets/` and load it with `stylesheet_link_tag`.
+
+## 3. Use them in views
+
+```html
+<ds-button variant="secondary">Cancel</ds-button>
+<ds-button variant="danger" size="sm">Delete</ds-button>
+```
+
+Attributes are plain HTML. ERB output is escaped as usual. Boolean attributes are present
+or absent:
+
+```html
+<ds-button <%= "disabled" unless @project.editable? %>>Edit</ds-button>
+```
+
+## Forms
+
+`ds-text-field` takes part in the form like a native `<input>`. Use the form builder's
+`field_name` for the `name`, so the value arrives in `params` as usual.
+
+```html
+<%= form_with model: @user do |form| %>
+  <ds-text-field
+    label="Email"
+    type="email"
+    name="<%= form.field_name(:email) %>"
+    value="<%= @user.email %>"
+    error="<%= @user.errors.full_messages_for(:email).first %>"
+    required
+  ></ds-text-field>
+
+  <ds-button type="submit">Save</ds-button>
+<% end %>
+```
+
+- `required` and `type="email"` are validated in the browser before submitting.
+- `error` shows the model's validation message, and marks the field invalid.
+- Turbo submits the form as usual, including these fields.
+
+## Events with Stimulus
+
+Components fire `ds-*` events. The value is in `event.detail.value`. Listen to them with
+`data-action`:
+
+```html
+<div data-controller="settings">
+  <ds-tabs label="Settings" data-action="ds-change->settings#tabChanged">
+    <ds-tab-panel name="general" label="General">…</ds-tab-panel>
+    <ds-tab-panel name="billing" label="Billing">…</ds-tab-panel>
+  </ds-tabs>
+</div>
+```
+
+```js
+// app/javascript/controllers/settings_controller.js
+import { Controller } from "@hotwired/stimulus"
+
+export default class extends Controller {
+  tabChanged(event) {
+    console.log("Selected tab:", event.detail.value)
+  }
+}
+```
+
+- `ds-input`: `ds-text-field`, on every keystroke.
+- `ds-change`: `ds-text-field` (on blur or Enter) and `ds-tabs` (when a tab is selected).
+- `ds-close`: `ds-dialog`, after it closes.
+
+## A dialog with Stimulus
+
+Open and close a dialog by setting its `open` property:
+
+```html
+<div data-controller="dialog">
+  <ds-button variant="danger" data-action="click->dialog#open">Delete project…</ds-button>
+
+  <ds-dialog label="Delete project?" data-dialog-target="dialog">
+    <p>This permanently deletes the project and all of its files.</p>
+
+    <ds-button slot="footer" variant="secondary" data-action="click->dialog#close">
+      Cancel
+    </ds-button>
+    <%= form_with url: project_path(@project), method: :delete, html: { slot: "footer" } do %>
+      <ds-button type="submit" variant="danger">Delete</ds-button>
+    <% end %>
+  </ds-dialog>
+</div>
+```
+
+```js
+// app/javascript/controllers/dialog_controller.js
+import { Controller } from "@hotwired/stimulus"
+
+export default class extends Controller {
+  static targets = ["dialog"]
+
+  open() {
+    this.dialogTarget.open = true
+  }
+
+  close() {
+    this.dialogTarget.open = false
+  }
+}
+```
+
+Escape, the close button and a backdrop click close the dialog by themselves.
+
+## Theming
+
+The dark theme follows the operating system. To force a theme, set it in your layout:
+
+```html
+<html lang="en" data-theme="dark">
+```
+
+To re-theme part of a page, override tokens in your CSS:
+
+```css
+.admin-area {
+  --ds-color-primary: #0f766e;
+}
+```
+
+## Before JavaScript loads
+
+Rails renders the tags; the components draw themselves when the JavaScript has loaded.
+`tokens.css` keeps closed dialogs hidden and shows only the first tab panel until then,
+and reserves space for buttons and text fields to limit layout shift. Turbo-inserted
+content (Turbo Frames and Streams) is upgraded automatically.

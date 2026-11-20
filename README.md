@@ -205,6 +205,8 @@ deployed by `.github/workflows/storybook.yml` on every push to `master` that cha
 ui package.
 
 - Stories live in `packages/ui/stories/`, outside `src/`, so they are never published.
+- The **Introduction** page and the **React and Next.js** and **Rails** guides are MDX
+  files in the same folder (`introduction.mdx`, `guide-react.mdx`, `guide-rails.mdx`).
 - Each component gets a docs page built from its JSDoc: attributes, properties, events,
   slots and CSS parts.
 - The toolbar switches the **theme** (light/dark) and the **direction** (LTR/RTL).

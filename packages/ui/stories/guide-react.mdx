@@ -1,0 +1,159 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Guides/React and Next.js" />
+
+# Using the components in React and Next.js
+
+The package includes React components for every element, with typed props and events.
+They work in React 18 and 19, and in Next.js (App Router), where they are also rendered on
+the server.
+
+## 1. Install
+
+Add an `.npmrc` next to your `package.json`. GitHub Packages needs a token with the
+`read:packages` scope, even for public packages.
+
+```ini
+@gowthaman-rently:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```bash
+npm install @gowthaman-rently/design-system-lit
+```
+
+## 2. Load the design tokens once
+
+In your app entry: `main.tsx` (Vite) or `app/layout.tsx` (Next.js).
+
+```tsx
+import '@gowthaman-rently/design-system-lit/tokens.css'
+```
+
+## 3. Use the components
+
+Always import from the `/react` entry point.
+
+```tsx
+import { Button, TextField } from '@gowthaman-rently/design-system-lit/react'
+
+export function Signup() {
+  return (
+    <form>
+      <TextField name="email" type="email" label="Email" required />
+      <Button type="submit">Create account</Button>
+    </form>
+  )
+}
+```
+
+- `ds-button` → `Button`
+- `ds-text-field` → `TextField`
+- `ds-dialog` → `Dialog`
+- `ds-tabs` and `ds-tab-panel` → `Tabs` and `TabPanel`
+
+Props match the element properties listed on each component's Docs page. Boolean props
+work as usual: `<Button disabled>`.
+
+## Events
+
+Components fire `ds-*` events. The React components expose them as props, and the value
+is in `event.detail`. `Button` uses the normal `onClick`.
+
+```tsx
+<TextField label="Search" onInput={(e) => setQuery(e.detail.value)} />  // ds-input
+<TextField label="Name" onChange={(e) => save(e.detail.value)} />       // ds-change, on blur or Enter
+<Tabs onChange={(e) => setTab(e.detail.value)}>…</Tabs>                 // ds-change
+<Dialog onClose={() => setOpen(false)}>…</Dialog>                        // ds-close
+```
+
+## Controlled components
+
+Pass the value and update it from the event, like a native input:
+
+```tsx
+const [email, setEmail] = useState('')
+<TextField label="Email" value={email} onInput={(e) => setEmail(e.detail.value)} />
+
+const [tab, setTab] = useState('general')
+<Tabs label="Settings" value={tab} onChange={(e) => setTab(e.detail.value)}>
+  <TabPanel name="general" label="General">…</TabPanel>
+  <TabPanel name="billing" label="Billing">…</TabPanel>
+</Tabs>
+```
+
+A dialog closes itself on Escape, the close button or a backdrop click. Keep your state in
+sync with `onClose`, or it won't open again:
+
+```tsx
+const [open, setOpen] = useState(false)
+
+<Button onClick={() => setOpen(true)}>Delete project…</Button>
+<Dialog label="Delete project?" open={open} onClose={() => setOpen(false)}>
+  <p>This permanently deletes the project.</p>
+  <div slot="footer">
+    <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+    <Button variant="danger" onClick={deleteProject}>Delete</Button>
+  </div>
+</Dialog>
+```
+
+## Forms
+
+`TextField` values are part of the form's `FormData`, and `required` and `type="email"`
+are validated on submit, just like native inputs. Give each field a `name`.
+
+```tsx
+function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault()
+  const data = Object.fromEntries(new FormData(event.currentTarget))
+}
+
+<form onSubmit={handleSubmit}>
+  <TextField name="name" label="Full name" required />
+  <TextField name="password" type="password" label="Password" error={passwordError} />
+  <Button type="submit">Save</Button>
+  <Button type="reset" variant="ghost">Reset</Button>
+</form>
+```
+
+Set `error` to show your own validation message. It also marks the field invalid.
+
+## Refs
+
+A `ref` gives you the element, with its methods:
+
+```tsx
+import type { DsTextField } from '@gowthaman-rently/design-system-lit'
+
+const field = useRef<DsTextField>(null)
+<TextField ref={field} label="Email" />
+
+field.current?.focus()
+field.current?.reportValidity()
+```
+
+## Styling
+
+`className` and `style` go on the element. Use tokens and CSS parts to customize:
+
+```css
+.checkout {
+  --ds-color-primary: #0f766e;
+}
+
+.pill::part(base) {
+  border-radius: 999px;
+}
+```
+
+## Next.js
+
+- Components are **rendered on the server**, including their styles, and hydrate in the
+  browser. No configuration is needed.
+- The `/react` entry point is a client module, so you can render components in Server
+  Components as long as you don't pass functions (like `onClick`). Put interactive parts
+  in a Client Component (`'use client'`).
+- Import the components only from `/react`, never from the plain package entry. The
+  `/react` entry loads Lit's hydration support before the components.
+- Server rendering uses `@lit-labs/ssr-react`, an experimental Lit Labs package.

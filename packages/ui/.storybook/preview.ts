@@ -32,6 +32,9 @@ const preview: Preview = {
   ],
   parameters: {
     controls: { expanded: true },
+    options: {
+      storySort: { order: ['Introduction', 'Guides', ['React and Next.js', 'Rails'], 'Components'] },
+    },
   },
 }
 

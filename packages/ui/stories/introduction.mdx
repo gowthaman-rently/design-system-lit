@@ -1,0 +1,82 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks'
+import * as ButtonStories from './button.stories'
+
+<Meta title="Introduction" />
+
+# Design System Lit
+
+Accessible, themeable UI components built as standard **web components** with
+[Lit](https://lit.dev). They work in any stack: React, Next.js, Rails, or plain HTML.
+
+<Canvas of={ButtonStories.Sizes} />
+
+## Get started
+
+- [React and Next.js guide](?path=/docs/guides-react-and-next-js--docs): React components with typed props and events, server-side rendering in Next.js.
+- [Rails guide](?path=/docs/guides-rails--docs): use the elements in ERB views, forms and Stimulus controllers.
+
+Install from GitHub Packages (needs a GitHub token with the `read:packages` scope, even
+though the package is public). Add an `.npmrc` next to your `package.json`:
+
+```ini
+@gowthaman-rently:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```bash
+npm install @gowthaman-rently/design-system-lit
+```
+
+## Components
+
+- [Button](?path=/docs/components-button--docs): `ds-button`. Variants, sizes, loading state, icons; submits and resets forms.
+- [TextField](?path=/docs/components-textfield--docs): `ds-text-field`. Label, hint, errors and validation; works in native forms.
+- [Dialog](?path=/docs/components-dialog--docs): `ds-dialog`. Modal with focus handling, Escape and backdrop click to close.
+- [Tabs](?path=/docs/components-tabs--docs): `ds-tabs` and `ds-tab-panel`. Keyboard navigation, right-to-left support.
+
+Each component's **Docs** page lists its properties, events, slots and CSS parts.
+
+## What you get
+
+- **Works everywhere.** Standard custom elements (`<ds-button>`), plus React wrappers (`<Button>`).
+- **Accessible.** Keyboard support, focus management and ARIA roles, checked with axe in light and dark themes.
+- **Themeable.** Colors, spacing, radii and motion come from `--ds-*` design tokens, with light and dark themes.
+- **Customizable.** Override tokens on any element, or restyle a component's insides with `::part()`.
+- **Native forms.** `ds-text-field` and `ds-button type="submit"` take part in forms like native inputs: `FormData`, reset and validation.
+- **Server-rendered in Next.js.** Components arrive styled in the HTML, before JavaScript loads.
+
+## Theming
+
+Load the tokens once per app:
+
+```js
+import '@gowthaman-rently/design-system-lit/tokens.css'
+```
+
+The dark theme follows the operating system. To force a theme, set it on `<html>`:
+
+```html
+<html data-theme="dark">
+```
+
+Re-theme any area by overriding tokens, and restyle internals with CSS parts:
+
+```css
+.brand {
+  --ds-color-primary: #0f766e;
+  --ds-color-on-primary: #ffffff;
+}
+
+ds-button.pill::part(base) {
+  border-radius: 999px;
+}
+```
+
+## Using this Storybook
+
+- **Toolbar:** switch the **theme** (light/dark) and the text **direction** (LTR/RTL).
+- **Controls** panel: change a story's properties live.
+- **Actions** panel: see the `ds-*` events a component fires.
+- **Accessibility** panel: axe results for the current story.
+
+Source code: [github.com/gowthaman-rently/design-system-lit](https://github.com/gowthaman-rently/design-system-lit)
