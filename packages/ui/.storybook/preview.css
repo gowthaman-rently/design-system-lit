@@ -1,0 +1,6 @@
+/* Story canvas follows the design tokens, so the theme toolbar switches the background too. */
+body {
+  background: var(--ds-color-bg);
+  color: var(--ds-color-text);
+  font-family: var(--ds-font-family);
+}

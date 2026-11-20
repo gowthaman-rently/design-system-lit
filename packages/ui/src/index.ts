@@ -1,1 +1,5 @@
 export { MyElement } from './my-element.js'
+export { DsButton, type ButtonSize, type ButtonVariant } from './button.js'
+export { DsTextField } from './text-field.js'
+export { DsDialog } from './dialog.js'
+export { DsTabPanel, DsTabs } from './tabs.js'

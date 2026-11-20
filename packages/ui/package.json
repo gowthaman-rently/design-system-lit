@@ -4,8 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "tokens.css",
+    "custom-elements.json"
   ],
+  "customElements": "custom-elements.json",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,14 +17,18 @@
     "./react": {
       "types": "./dist/react/index.d.ts",
       "default": "./dist/react/index.js"
-    }
+    },
+    "./tokens.css": "./tokens.css"
   },
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "build": "tsc && cem analyze",
+    "typecheck": "tsc --noEmit && tsc -p stories",
+    "storybook": "cem analyze && storybook dev --port 6006",
+    "build-storybook": "cem analyze && storybook build"
   },
   "dependencies": {
+    "@lit-labs/ssr-react": "^0.3.4",
     "@lit/react": "^1.0.8",
     "lit": "^3.3.3"
   },
@@ -34,8 +41,15 @@
     }
   },
   "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@storybook/addon-a11y": "^10.6.7",
+    "@storybook/addon-docs": "^10.6.7",
+    "@storybook/addon-themes": "^10.6.7",
+    "@storybook/web-components-vite": "^10.6.7",
     "@types/react": "^19.3.0",
     "react": "^19.3.1",
-    "typescript": "~7.0.2"
+    "storybook": "^10.6.7",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.8"
   }
 }

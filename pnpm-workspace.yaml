@@ -7,3 +7,6 @@ packages:
 allowBuilds:
   sharp: false
   unrs-resolver: false
+  # Storybook / custom-elements analyzer (native binaries come from optional platform packages)
+  esbuild: false
+  rs-module-lexer: false

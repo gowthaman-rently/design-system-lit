@@ -1,12 +1,8 @@
-import { MyElement } from '@design-system-poc/ui/react'
+import { Showcase } from './Showcase'
 import './App.css'
 
 function App() {
-  return (
-    <>
-      <MyElement> Hello</MyElement>
-    </>
-  )
+  return <Showcase />
 }
 
 export default App

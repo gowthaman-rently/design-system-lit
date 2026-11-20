@@ -1,0 +1,11 @@
+{
+  // Type-checks stories and the Storybook config (not part of the package build).
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "..",
+    "resolveJsonModule": true,
+    "types": ["vite/client"]
+  },
+  "include": [".", "../.storybook"]
+}

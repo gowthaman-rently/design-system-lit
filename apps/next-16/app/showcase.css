@@ -1,0 +1,87 @@
+/* Page layout for the showcase (not part of the design system). */
+.showcase {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem 1.5rem 4rem;
+  background: var(--ds-color-bg);
+  color: var(--ds-color-text);
+  font-family: var(--ds-font-family);
+  text-align: start;
+}
+.showcase > * {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.showcase-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.showcase h1 {
+  margin: 0;
+  color: var(--ds-color-text);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+.showcase h2 {
+  margin: 0 0 0.75rem;
+  color: var(--ds-color-text);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+.showcase p {
+  margin: 0 0 0.75rem;
+  color: var(--ds-color-text-muted);
+  font-size: 1rem;
+}
+.showcase code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
+}
+
+.showcase section {
+  margin-bottom: 2.5rem;
+}
+.showcase .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.showcase .form {
+  display: grid;
+  gap: 1rem;
+  max-width: 24rem;
+}
+.showcase .output {
+  margin: 1rem 0 0;
+  padding: 0.75rem;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-surface-raised);
+  color: var(--ds-color-text);
+  font-size: 0.875rem;
+}
+
+/* Customization: tokens overridden for one area only */
+.showcase .brand {
+  --ds-color-primary: #0f766e;
+  --ds-color-primary-hover: #115e59;
+  --ds-color-on-primary: #ffffff;
+  --ds-radius-md: 999px;
+}
+
+/* Customization: styling a component's inner element via ::part() */
+.showcase .pill::part(base) {
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
