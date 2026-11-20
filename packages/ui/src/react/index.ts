@@ -1,7 +1,7 @@
 'use client'
 
 // React wrappers for the design-system web components.
-//   import { Button } from '@design-system-poc/ui/react'
+//   import { Button } from '@gowthaman-rently/design-system-lit/react'
 // Importing this file also registers the custom elements in the browser.
 // Component events (ds-*) are exposed as typed React props (onInput, onChange, onClose).
 

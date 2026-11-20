@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:ui": "pnpm --filter ui dev",
+    "dev:ui": "pnpm --filter design-system-lit dev",
     "dev:react": "pnpm --filter react-19 dev",
     "dev:next": "pnpm --filter next-16 dev",
-    "storybook": "pnpm --filter ui storybook",
+    "storybook": "pnpm --filter design-system-lit storybook",
     "build": "pnpm --recursive build",
-    "typecheck": "pnpm --filter ui build && pnpm --recursive typecheck",
+    "typecheck": "pnpm --filter design-system-lit build && pnpm --recursive typecheck",
     "lint": "pnpm --recursive lint"
   }
 }

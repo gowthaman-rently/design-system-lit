@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from 'react'
-import { Button, Dialog, TabPanel, Tabs, TextField } from '@design-system-poc/ui/react'
+import { Button, Dialog, TabPanel, Tabs, TextField } from '@gowthaman-rently/design-system-lit/react'
 import './showcase.css'
 
 const themes = ['system', 'light', 'dark'] as const

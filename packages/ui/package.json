@@ -1,7 +1,15 @@
 {
-  "name": "@design-system-poc/ui",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@gowthaman-rently/design-system-lit",
+  "version": "0.1.0",
+  "description": "Lit web components with React wrappers, design tokens and SSR support",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gowthaman-rently/design-system-lit.git",
+    "directory": "packages/ui"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "type": "module",
   "files": [
     "dist",

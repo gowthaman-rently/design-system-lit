@@ -1,7 +1,7 @@
 /*
- * Design tokens for @design-system-poc/ui.
+ * Design tokens for @gowthaman-rently/design-system-lit.
  *
- * Import once in each app:  import '@design-system-poc/ui/tokens.css'
+ * Import once in each app:  import '@gowthaman-rently/design-system-lit/tokens.css'
  * Theme it by overriding any --ds-* variable on :root or on any ancestor
  * element (custom properties pass through shadow DOM).
  * Dark theme: follows the OS, or force it with <html data-theme="dark|light">.
