@@ -1,3 +1,9 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+
+# Install-script approvals for dependencies (only read from the workspace root).
+# Moved from apps/next-16 (added by create-next-app).
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
