@@ -8,21 +8,34 @@
   ],
   "exports": {
     ".": {
-      "@design-system-poc/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
     }
   },
   "scripts": {
-    "dev": "vite build --watch --emptyOutDir false",
-    "build": "vite build && tsc -p tsconfig.build.json",
-    "typecheck": "tsc"
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@lit/react": "^1.0.8",
     "lit": "^3.3.3"
   },
+  "peerDependencies": {
+    "react": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "typescript": "~7.0.2",
-    "vite": "^8.3.6"
+    "@types/react": "^19.3.0",
+    "react": "^19.3.1",
+    "typescript": "~7.0.2"
   }
 }

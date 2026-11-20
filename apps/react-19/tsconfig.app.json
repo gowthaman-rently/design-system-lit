@@ -16,14 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Design system (@design-system-poc/ui) */
-    // Resolve workspace packages to their TypeScript source (see vite.config.ts).
-    "customConditions": ["@design-system-poc/source"],
-    // The UI source uses Lit's decorators; these must match tsconfig.base.json
-    // because this project type-checks that source with its own settings.
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,

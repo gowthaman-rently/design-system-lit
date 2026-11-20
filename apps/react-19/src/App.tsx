@@ -1,9 +1,10 @@
+import { MyElement } from '@design-system-poc/ui/react'
 import './App.css'
 
 function App() {
   return (
     <>
-      <my-element > Hello</my-element>
+      <MyElement> Hello</MyElement>
     </>
   )
 }

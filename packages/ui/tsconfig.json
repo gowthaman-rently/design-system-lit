@@ -1,7 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["vite/client"]
+    /* Build: compile src/ to dist/ (.js + .d.ts) */
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "preserveWatchOutput": true
   },
   "include": ["src"]
 }
